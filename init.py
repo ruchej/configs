@@ -4,10 +4,6 @@ import shutil
 from pathlib import Path
 
 
-configs = Path.cwd() / 'home'
-home = Path.home()
-
-
 def rm(path: Path) -> None:
     '''удаляет файл или директорию'''
     if path.exists():
@@ -21,17 +17,21 @@ def rm(path: Path) -> None:
             path.unlink()
             print(f'Deleted file {path}')
 
-for d in configs.joinpath(Path('.config')).iterdir():
-    target_dir = home.joinpath(Path('.config'), Path(d.name))
-    rm(target_dir)
-    target_dir.symlink_to(d)
-    print(f'Create symlink {target_dir} to {d}')
 
-for d in configs.iterdir():
-    if d.name == '.config':
-        continue
-    target_dir = home.joinpath(Path(d.name))
-    rm(target_dir)
-    target_dir.symlink_to(d)
-    print(f'Create symlink {target_dir} to {d}')
+def make_symlink(config_dir: Path, target_dir: Path, exclude: tuple[str] = ('',)) -> None:
 
+    for d in config_dir.iterdir():
+        if d.name in exclude:
+            continue
+        target = target_dir.joinpath(Path(d.name))
+        rm(target)
+        target.symlink_to(d)
+        print(f'Create symlink {target} to {d}')
+
+
+if __name__ == '__main__':
+
+    configs = Path.cwd() / 'home'
+    home = Path.home()
+    make_symlink(configs.joinpath(Path('.config')), home.joinpath(Path('.config')))
+    make_symlink(configs, home, exclude=('.config',))
