@@ -1,0 +1,25 @@
+#!/bin/bash
+
+connected=$(xrandr | grep 'DVI-D-0 connected')
+
+# подключен ли монитор
+if [[ -z "$connected" ]]; then
+    #exec "i3-nagbar -t warning -m  'Монитор не подключен'"
+
+    # выключим отображение, если вдруг оно активно (просто был выдернут шнур)
+    xrandr --output DVI-D-0 --off
+else
+	# монитор подключен
+	# проверим отображается ли он
+	displayed=$(xrandr | grep 'DVI-D-0 connected 1680x1050+1920+0')
+
+	if [[ -z "$displayed" ]]; then
+		# не отображается, включим отображение
+	#	exec "i3-nagbar -t warning -m  'не отображается, включим отображение'"
+		xrandr --output DVI-D-0 --mode 1680x1050 --pos 1920x0
+	else
+		# отображается, выключим отображение
+	#	exec "i3-nagbar -t warning -m  'отображается, выключим отображение'"
+		xrandr --output DVI-D-0 --off
+	fi
+fi
