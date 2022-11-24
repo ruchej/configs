@@ -38,6 +38,7 @@ utils.opt('o', 'foldlevelstart', 1)
 utils.opt('o', 'path', '**')
 utils.opt('o', 'wildmenu', true)
 utils.opt('o', 'completeopt', 'menuone,noselect')
+utils.opt('o', 'langmap', [[ёйцукенгшщзхъфывапролджэячсмитьбю;`qwertyuiop[]asdfghjkl\\;'zxcvbnm\\,.,ЙЦУКЕHГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ;QWERTYUIOP{}ASDFGHJKL:\\"ZXCVBNM<>]])
 
 cmd 'syntax enable'
 cmd 'filetype plugin indent on'
