@@ -14,6 +14,7 @@ vim.cmd 'autocmd BufWritePost plugins.lua PackerCompile' -- Auto compile when th
 return require('packer').startup(function(use)
 
     use {'neovim/nvim-lspconfig'}
+    use {'williamboman/nvim-lsp-installer'}
     use {'hrsh7th/nvim-cmp'}
     use {'hrsh7th/cmp-nvim-lsp'}
     use {'saadparwaiz1/cmp_luasnip'}
@@ -66,9 +67,10 @@ return require('packer').startup(function(use)
     })
 
     use({ "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, })
+    use {'mechatroner/rainbow_csv'}
 
 
-  if packer_bootstrap then
-    require('packer').sync()
-  end
+  --if packer_bootstrap then
+  --  require('packer').sync()
+  --end
 end)
