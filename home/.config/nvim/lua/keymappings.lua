@@ -1,4 +1,6 @@
 local utils = require('utils')
+local cmp = require('cmp')
+
 
 utils.map('n', ',<space>', '<cmd>noh<cr>')      -- Clear highlights
 utils.map('i', 'jk', '<Esc>')                   -- jk to escape
@@ -29,3 +31,4 @@ utils.map('n', ',g', '<cmd>Telescope live_grep<cr>')
 
 -- Настройки для включения превьюшки файла MarkDown
 utils.map('n', '<c-p>', '<cmd>MarkdownPreviewToggle<cr>')
+
