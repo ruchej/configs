@@ -32,3 +32,6 @@ utils.map('n', ',g', '<cmd>Telescope live_grep<cr>')
 -- Настройки для включения превьюшки файла MarkDown
 utils.map('n', '<c-p>', '<cmd>MarkdownPreviewToggle<cr>')
 
+-- Настройка для  Gitsigns
+utils.map('n', '<leader>hn', '<cmd>lua require"gitsigns".next_hunk()<cr>') -- Следующее изменение
+utils.map('n', '<leader>hp', '<cmd>lua require"gitsigns".prev_hunk()<cr>') -- Предылущее изменение
