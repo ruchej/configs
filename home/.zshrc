@@ -103,6 +103,7 @@ alias bvpn='echo alx | sudo -S /home/alx/openvpn_configs/startvpn_belka.sh'
 alias gvpn='nmcli c up "GGOK vpn"'
 alias r='ranger'
 alias mnt='sudo mount -o users,uid=1000,gid=1000'
+alias lsblk='lsblk -o +fstype,label'
 
 export EDITOR=$(which nvim)
 
