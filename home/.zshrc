@@ -104,6 +104,8 @@ alias gvpn='nmcli c up "GGOK vpn"'
 alias r='ranger'
 alias mnt='sudo mount -o users,uid=1000,gid=1000'
 alias lsblk='lsblk -o +fstype,label'
+alias lfvpn='sudo openvpn /home/alx/lendfinance/openvpn/lend_finance.ovpn'
+alias h='history'
 
 export EDITOR=$(which nvim)
 
