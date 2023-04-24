@@ -1,10 +1,9 @@
 local fn = vim.fn
-local execute = vim.api.nvim_command
 
 -- Auto install packer.nvim if not exists
 local install_path = fn.stdpath('data')..'/site/pack/packer/opt/packer.nvim'
 if fn.empty(fn.glob(install_path)) > 0 then
-  packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+  local packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
 end
 
 vim.cmd [[packadd packer.nvim]]
@@ -60,7 +59,7 @@ return require('packer').startup(function(use)
 
     --
     use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
-    
+
     -- install without yarn or npm
     use({
         "iamcco/markdown-preview.nvim",
