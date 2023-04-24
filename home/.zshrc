@@ -99,6 +99,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+alias ls='ls --color=auto --group-directories-first'
 alias bvpn='echo alx | sudo -S /home/alx/openvpn_configs/startvpn_belka.sh'
 alias gvpn='nmcli c up "GGOK vpn"'
 alias r='ranger'
@@ -106,6 +107,7 @@ alias mnt='sudo mount -o users,uid=1000,gid=1000'
 alias lsblk='lsblk -o +fstype,label'
 alias lfvpn='sudo openvpn /home/alx/lendfinance/openvpn/lend_finance.ovpn'
 alias h='history'
+alias sd='/home/alx/projects/stable-diffusion-webui/webui.sh --lowvram'
 
 export EDITOR=$(which nvim)
 
