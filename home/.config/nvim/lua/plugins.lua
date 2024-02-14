@@ -13,7 +13,7 @@ vim.cmd 'autocmd BufWritePost plugins.lua PackerCompile' -- Auto compile when th
 return require('packer').startup(function(use)
 
     use {'neovim/nvim-lspconfig'}
-    use {'williamboman/mason.nvim'}
+    use {'williamboman/mason.nvim', opts = {ensure_installed = {"cland"}}}
     use {'williamboman/mason-lspconfig.nvim'}
     use {'hrsh7th/nvim-cmp'}
     use {'hrsh7th/cmp-nvim-lsp'}
@@ -32,7 +32,7 @@ return require('packer').startup(function(use)
     use {'zivyangll/git-blame.vim'}
 
     -- Этот плагин добавляет направляющие отступов ко всем линиям (включая пустые линии).
-    use {'lukas-reineke/indent-blankline.nvim'}
+    use {'lukas-reineke/indent-blankline.nvim', main = "ibl", opts = {}}
 
     --use {'preservim/nerdtree'}
     use {'francoiscabrol/ranger.vim'}
@@ -54,7 +54,7 @@ return require('packer').startup(function(use)
     use {'Vimjas/vim-python-pep8-indent'}
 
     -- Поиск по файлам
-    use {'nvim-telescope/telescope.nvim',  tag = '0.1.0' }
+    use {'nvim-telescope/telescope.nvim',  tag = '0.1.4', requires = { {'nvim-lua/plenary.nvim'} } }
     use {'nvim-telescope/telescope-fzf-native.nvim',  run = 'make' }
 
     --
@@ -67,7 +67,9 @@ return require('packer').startup(function(use)
     })
 
     use {'mechatroner/rainbow_csv'}
+    use {'sindrets/diffview.nvim'}
 
+    use {'folke/zen-mode.nvim'}
 
   --if packer_bootstrap then
   --  require('packer').sync()

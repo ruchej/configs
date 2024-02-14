@@ -2,8 +2,6 @@ require('nvim-surround').setup()
 
 local utils = require('utils')
 local nvim_lsp = require('lspconfig')
-local indent_blankline = require("indent_blankline")
-
 
 local cmd = vim.cmd
 local autocmd = vim.api.nvim_create_autocmd
@@ -19,19 +17,19 @@ utils.opt('w', 'relativenumber', true)
 utils.opt('w', 'scrolloff', 7)
 utils.opt('w', 'cursorline', true)
 
-utils.opt('b', 'tabstop', indent)
-utils.opt('b', 'softtabstop', indent)
-utils.opt('b', 'shiftwidth', indent)
-utils.opt('b', 'expandtab', true)
-utils.opt('b', 'smartindent', true)
-utils.opt('b', 'fileformat', 'unix')
+utils.opt('o', 'tabstop', indent)
+utils.opt('o', 'softtabstop', indent)
+utils.opt('o', 'shiftwidth', indent)
+utils.opt('o', 'expandtab', true)
+utils.opt('o', 'smartindent', true)
+utils.opt('o', 'fileformat', 'unix')
 
 utils.opt('o', 'splitright', true)
 utils.opt('o', 'splitbelow', true)
 utils.opt('o', 'incsearch', true)
 utils.opt('o', 'diffopt', 'vertical')
 utils.opt('o', 'foldmethod', 'indent')
-utils.opt('o', 'foldlevelstart', 1)
+utils.opt('o', 'foldlevelstart', 99)
 
 utils.opt('o', 'path', '**')
 utils.opt('o', 'wildmenu', true)
@@ -42,7 +40,8 @@ cmd 'syntax enable'
 cmd 'filetype plugin indent on'
 cmd 'colorscheme gruvbox'
 cmd 'set noendofline'
-cmd 'set noswapfile'
+cmd 'set swapfile'
+cmd 'syn sync fromstart'
 
 autocmd('BufWritePre', {pattern = '*.py', command = [[%s/\s\+$//e]]})
 
@@ -72,6 +71,7 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
   vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
   vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
   vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
   vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
   vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
@@ -81,8 +81,7 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
   vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
+  vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, utils.merge(bufopts, {desc = 'Форматирование кода'}))
 end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
@@ -90,7 +89,16 @@ end
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-local servers = { 'pyright', 'lua_ls', 'jsonls', 'marksman', 'bashls', 'tsserver', 'volar' }
+local servers = {
+        'pyright',
+        'lua_ls',
+        'jsonls',
+        'marksman',
+        'bashls',
+        'tsserver',
+        'volar',
+        'clangd',
+    }
 for _, lsp in ipairs(servers) do
     nvim_lsp[lsp].setup {
         on_attach = on_attach,
@@ -101,13 +109,6 @@ for _, lsp in ipairs(servers) do
 end
 
 -- end nvim-lspconfig
-
-
-indent_blankline.setup {
-    space_char_blankline = " ",
-    show_current_context = true,
-    show_current_context_start = true,
-}
 
 --  Настройки для дебага python файла. Плагин dap
 --  https://github.com/mfussenegger/nvim-dap#usage
@@ -126,19 +127,23 @@ vim.fn.sign_define('DapStopped', {text='⏹', texthl='DapStopped', linehl='DapSt
 
 local dap, dapui = require("dap"), require("dapui")
 
-dap.listeners.after.event_initialized["dapui_config"] = function()
+dap.listeners.after["event_initialized"]["dapui_config"] = function()
   dapui.open()
 end
-dap.listeners.before.event_terminated["dapui_config"] = function()
+dap.listeners.before["event_terminated"]["dapui_config"] = function()
   dapui.close()
 end
-dap.listeners.before.event_exited["dapui_config"] = function()
+dap.listeners.before["event_exited"]["dapui_config"] = function()
   dapui.close()
 end
 
 
 dapui.setup({
-  icons = { expanded = "▾", collapsed = "▸" },
+  icons = {
+    expanded = "▾",
+    collapsed = "▸",
+    current_frame = "🔵",
+  },
   mappings = {
     -- Use a table to apply multiple mappings
     expand = { "<CR>", "<2-LeftMouse>" },
@@ -148,26 +153,33 @@ dapui.setup({
     repl = "r",
     toggle = "t",
   },
-  -- Expand lines larger than the window
-  -- Requires >= 0.7
-  expand_lines = vim.fn.has("nvim-0.7"),
-  -- Layouts define sections of the screen to place windows.
-  -- The position can be "left", "right", "top" or "bottom".
-  -- The size specifies the height/width depending on position. It can be an Int
-  -- or a Float. Integer specifies height/width directly (i.e. 20 lines/columns) while
-  -- Float value specifies percentage (i.e. 0.3 - 30% of available lines/columns)
-  -- Elements are the elements shown in the layout (in order).
-  -- Layouts are opened in order so that earlier layouts take priority in window sizing.
+  element_mappings = {}, -- Добавьте соответствующие отображения элементов
+  force_buffers = true, -- Добавьте соответствующее значение
+  controls = {
+    enabled = true,
+    element = "widgets",
+    icons = {
+      enabled = true,
+      pause = "⏸️",
+      play = "▶️",
+      step_into = "↘️",
+      step_over = "➡️",
+      step_out = "↖️",
+      step_back = "⏪",
+      run_last = "⏩",
+      terminate = "⛔",
+    },
+  },
+  expand_lines = vim.fn.has("nvim-0.9.2"),
   layouts = {
     {
       elements = {
-      -- Elements can be strings or table with id and size keys.
         { id = "scopes", size = 0.25 },
         "breakpoints",
         "stacks",
         "watches",
       },
-      size = 40, -- 40 columns
+      size = 40,
       position = "left",
     },
     {
@@ -175,22 +187,23 @@ dapui.setup({
         "repl",
         "console",
       },
-      size = 0.25, -- 25% of total lines
+      size = 0.25,
       position = "bottom",
     },
   },
   floating = {
-    max_height = nil, -- These can be integers or a float between 0 and 1.
-    max_width = nil, -- Floats will be treated as percentage of your screen.
-    border = "single", -- Border style. Can be "single", "double" or "rounded"
+    max_height = nil,
+    max_width = nil,
+    border = "single",
     mappings = {
       close = { "q", "<Esc>" },
     },
   },
   windows = { indent = 1 },
   render = {
-    max_type_length = nil, -- Can be integer or nil.
-  }
+    indent = 2, -- Добавьте соответствующее значение
+    max_type_length = nil,
+  },
 })
 -----------------------------------------------------------------------
 
@@ -251,3 +264,75 @@ require("mason").setup({
     }
 })
 require("mason-lspconfig").setup()
+
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all" (the five listed parsers should always be installed)
+  ensure_installed = { "c", "lua", "vim", "vimdoc", "query" },
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  -- Automatically install missing parsers when entering buffer
+  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+  auto_install = false,
+
+  -- List of parsers to ignore installing (for "all")
+  ignore_install = { "javascript" },
+
+  ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
+  -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
+
+    modules = {
+    -- Set this to true to enable the TypeScript parser
+    -- If you want to enable TypeScript highlighting, you need to set this to true
+    -- even if you don't have any TypeScript files in your project
+    enabled = true,
+
+    -- If you want to enable TypeScript highlighting, you need to set this to true
+    -- even if you don't have any TypeScript files in your project
+    disable = {},
+
+    -- Setting this to true will run the TypeScript compiler and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+  highlight = {
+    enable = true,
+
+    -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+    -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+    -- the name of the parser)
+    -- list of language that will be disabled
+    -- disable = { "c", "rust" },
+    -- -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
+    -- disable = function(lang, buf)
+    --     local max_filesize = 100 * 1024 -- 100 KB
+    --     local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+    --     if ok and stats and stats.size > max_filesize then
+    --         return true
+    --     end
+    -- end,
+
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}
+
+require'lspconfig'.volar.setup{
+  filetypes = {
+        'typescript',
+        'javascript',
+        'javascriptreact',
+        'typescriptreact',
+        'vue',
+        'json',
+    }
+}
+require("ibl").setup()
+
+require('zen-mode').setup({window={width=0.85}})
