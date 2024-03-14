@@ -8,14 +8,14 @@ end
 -- https://github.com/johnsoncodehk/volar/blob/20d713b/packages/shared/src/types.ts
 local volar_init_options = {
   typescript = {
-    tsdk = '',
+    tsdk = '/usr/local/lib/node_modules/typescript/lib'
   },
 }
 
 return {
   default_config = {
     cmd = { 'vue-language-server', '--stdio' },
-    filetypes = { 'vue' },
+    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json' },
     root_dir = util.root_pattern 'package.json',
     init_options = volar_init_options,
     on_new_config = function(new_config, new_root_dir)

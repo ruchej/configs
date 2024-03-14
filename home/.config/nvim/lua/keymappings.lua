@@ -1,5 +1,4 @@
 local utils = require('utils')
-local cmp = require('cmp')
 local zenmode = require('zen-mode')
 
 

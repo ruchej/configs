@@ -71,6 +71,27 @@ return require('packer').startup(function(use)
 
     use {'folke/zen-mode.nvim'}
 
+    use {
+        "nvim-neo-tree/neo-tree.nvim",
+        branch = "v3.x",
+        requires = {
+            "nvim-lua/plenary.nvim",
+            "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+            "MunifTanjim/nui.nvim",
+        }
+    }
+
+    use {
+      'antosha417/nvim-lsp-file-operations',
+      requires = {
+        'nvim-lua/plenary.nvim',
+        'nvim-neo-tree/neo-tree.nvim',
+      },
+      config = function()
+        require("lsp-file-operations").setup()
+      end,
+    }
+
   --if packer_bootstrap then
   --  require('packer').sync()
   --end

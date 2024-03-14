@@ -86,6 +86,7 @@ end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
+vim.g.python3_host_prog = '/usr/bin/python'
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
@@ -324,15 +325,13 @@ require'nvim-treesitter.configs'.setup {
 }
 
 require'lspconfig'.volar.setup{
-  filetypes = {
-        'typescript',
-        'javascript',
-        'javascriptreact',
-        'typescriptreact',
-        'vue',
-        'json',
+  init_options = {
+    typescript = {
+      tsdk = '/usr/local/lib/node_modules/typescript/lib'
     }
+  }
 }
-require("ibl").setup()
 
+require("ibl").setup()
 require('zen-mode').setup({window={width=0.85}})
+require("lsp-file-operations").setup()
