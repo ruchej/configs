@@ -27,19 +27,21 @@ utils.map('n', '<leader>dui', '<cmd>lua require"dapui".toggle()<cr>')
 
 -- Настройки для поиска файлов модуля telescope
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', 'ff', builtin.find_files, {})
-vim.keymap.set('n', 'fg', builtin.live_grep, {})
-vim.keymap.set('n', 'fb', builtin.buffers, {})
-vim.keymap.set('n', 'fh', builtin.help_tags, {})
+vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope find files' })
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Telescope live grep' })
+vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Telescope buffers' })
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help tags' })
 
 -- Настройки для включения превьюшки файла MarkDown
 utils.map('n', '<c-p>', '<cmd>MarkdownPreviewToggle<cr>')
 
 -- Настройка для  Gitsigns
-utils.map('n', '<leader>hj', '<cmd>lua require"gitsigns".next_hunk()<cr>') -- Следующее изменение
-utils.map('n', '<leader>hk', '<cmd>lua require"gitsigns".prev_hunk()<cr>') -- Предылущее изменение
-utils.map('n', '<leader>hp', '<cmd>lua require"gitsigns".preview_hunk()<cr>') -- Показать изменения
-utils.map('n', '<leader>td', '<cmd>lua require"gitsigns".toggle_deleted()<cr>') -- Показать удалённые строки
+utils.map('n', '<leader>hn', '<cmd>lua require"gitsigns".nav_hunk("next")<cr>') -- Следующее изменение
+utils.map('n', '<leader>hp', '<cmd>lua require"gitsigns".nav_hunk("prev")<cr>') -- Предылущее изменение
+utils.map('n', '<leader>hv', '<cmd>lua require"gitsigns".preview_hunk()<cr>') -- Показать изменения
+utils.map('n', '<leader>td', '<cmd>lua require"gitsigns".preview_hunk_inline()()<cr>') -- Показать удалённые строки
 
 -- Настройка для zen-mode
 vim.keymap.set('n', '<C-w>o', zenmode.toggle, {})
+
+utils.map('n', '<leader>cs', ':lua convertWordUnderCursor()<CR>', { noremap = true, silent = true })

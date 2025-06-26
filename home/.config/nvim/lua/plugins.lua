@@ -23,7 +23,7 @@ return require('packer').startup(function(use)
     -- Для дебагов, точки остановки
     use {'mfussenegger/nvim-dap'}
     use {'mfussenegger/nvim-dap-python'}
-    use {'rcarriga/nvim-dap-ui', requires = {"mfussenegger/nvim-dap"} }
+    use { "rcarriga/nvim-dap-ui", requires = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"} }
     -- plenary.nvim набор функций для работы с lua
     use {'nvim-lua/plenary.nvim'}
     -- gitsigns.nvim Сверхбыстрые украшения git реализованы чисто в lua/teal.
@@ -54,8 +54,8 @@ return require('packer').startup(function(use)
     use {'Vimjas/vim-python-pep8-indent'}
 
     -- Поиск по файлам
-    use {'nvim-telescope/telescope.nvim',  tag = '0.1.4', requires = { {'nvim-lua/plenary.nvim'} } }
-    use {'nvim-telescope/telescope-fzf-native.nvim',  run = 'make' }
+    use {'nvim-telescope/telescope.nvim',  tag = '0.1.8', requires = { {'nvim-lua/plenary.nvim'} } }
+    use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release' }
 
     --
     use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}

@@ -105,6 +105,7 @@ alias ls='ls --color=auto --group-directories-first'
 alias bvpn='echo alx | sudo -S /home/alx/openvpn_configs/startvpn_belka.sh'
 alias gvpn='nmcli c up "GGOK vpn"'
 alias r='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
+alias ra='ranger'
 alias mnt='sudo mount -o users,uid=1000,gid=1000'
 alias lsblk='lsblk -o +fstype,label'
 alias lfvpn='sudo openvpn /home/alx/lendfinance/openvpn/lend_finance.ovpn'
@@ -118,3 +119,6 @@ alias pre='poetry run pre-commit run --show-diff-on-failure --color=always --all
 export EDITOR=$(which nvim)
 
 #source /usr/share/nvm/init-nvm.sh
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/alx/.cache/lm-studio/bin"

@@ -1,5 +1,3 @@
-require('nvim-surround').setup()
-
 local utils = require('utils')
 local nvim_lsp = require('lspconfig')
 
@@ -11,6 +9,7 @@ local indent = 4
 utils.opt('o', 'mouse', 'a')
 utils.opt('o', 'clipboard', 'unnamedplus')
 utils.opt('o', 'encoding', 'utf-8')
+utils.opt('o', 'timeoutlen', 3000)
 
 utils.opt('w', 'number', true)
 utils.opt('w', 'relativenumber', true)
@@ -35,6 +34,7 @@ utils.opt('o', 'path', '**')
 utils.opt('o', 'wildmenu', true)
 utils.opt('o', 'completeopt', 'menuone,noselect')
 utils.opt('o', 'langmap', [[ёйцукенгшщзхъфывапролджэячсмитьбю;`qwertyuiop[]asdfghjkl\;'zxcvbnm\,.,ЙЦУКЕHГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ;QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM<>]])
+utils.opt('o', 'statusline', '%{expand("%:~:.")} %h%w%m%r %=%(%l,%c%V %= %P%)')
 
 cmd 'syntax enable'
 cmd 'filetype plugin indent on'
@@ -51,7 +51,7 @@ vim.lsp.set_log_level 'warn'
 require('vim.lsp.log').set_format_func(vim.inspect)
 
 -- Mappings.
--- See `:help vim.diagnostic.*` for documentation on any of the below functions
+-- See: https://github.com/neovim/nvim-lspconfig/tree/54eb2a070a4f389b1be0f98070f81d23e2b1a715#suggested-configuration
 local opts = { noremap=true, silent=true }
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
@@ -66,23 +66,50 @@ local on_attach = function(client, bufnr)
 
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  local bufopts = { noremap=true, silent=true, buffer=bufnr }
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wl', function()
+local bufopts = { noremap=true, silent=true, buffer=bufnr }
+
+-- Переход к объявлению
+vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+-- Переход к определению
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+-- Показать всплывающую подсказку
+vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+-- Переход к реализации
+vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+-- Показать информацию о сигнатуре функции
+vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+-- Добавить папку в рабочее пространство
+vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+-- Удалить папку из рабочего пространства
+vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+-- Показать список папок рабочего пространства
+vim.keymap.set('n', '<space>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, bufopts)
-  vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-  vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-  vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, utils.merge(bufopts, {desc = 'Форматирование кода'}))
+end, bufopts)
+-- Показать определение типа
+vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
+-- Переименование символа
+vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
+-- Показать действия кода (code actions)
+vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
+-- Показать ссылки на символ
+vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+-- Форматировать файл (асинхронно)
+vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
 end
+
+-- Configure `ruff-lsp`.
+-- See: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#ruff_lsp
+-- For the default config, along with instructions on how to customize the settings
+--require('lspconfig').ruff_lsp.setup {
+--  on_attach = on_attach,
+--  init_options = {
+--    settings = {
+--      -- Any extra CLI arguments for `ruff` go here.
+--      args = {},
+--    }
+--  }
+--}
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
@@ -93,12 +120,14 @@ capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 local servers = {
         'pyright',
         'lua_ls',
+        'ruff',
         'jsonls',
         'marksman',
         'bashls',
-        'tsserver',
+        'ts_ls',
         'volar',
         'clangd',
+--        'ruff_lsp',
     }
 for _, lsp in ipairs(servers) do
     nvim_lsp[lsp].setup {
@@ -215,30 +244,31 @@ vim.opt.listchars:append("eol:↴")
 
 require('gitsigns').setup {
   signs = {
-    add          = { hl = 'GitSignsAdd'   , text = '│', numhl='GitSignsAddNr'   , linehl='GitSignsAddLn'    },
-    change       = { hl = 'GitSignsChange', text = '│', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn' },
-    delete       = { hl = 'GitSignsDelete', text = '_', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn' },
-    topdelete    = { hl = 'GitSignsDelete', text = '‾', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn' },
-    changedelete = { hl = 'GitSignsChange', text = '~', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn' },
-    untracked    = { hl = 'GitSignsAdd'   , text = '┆', numhl='GitSignsAddNr'   , linehl='GitSignsAddLn'    },
+    add          = { text = '┃' },
+    change       = { text = '┃' },
+    delete       = { text = '_' },
+    topdelete    = { text = '‾' },
+    changedelete = { text = '~' },
+    untracked    = { text = '┆' },
   },
   signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
   numhl      = false, -- Toggle with `:Gitsigns toggle_numhl`
   linehl     = false, -- Toggle with `:Gitsigns toggle_linehl`
   word_diff  = false, -- Toggle with `:Gitsigns toggle_word_diff`
   watch_gitdir = {
-    interval = 1000,
     follow_files = true
   },
-  attach_to_untracked = true,
+  auto_attach = true,
+  attach_to_untracked = false,
   current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
   current_line_blame_opts = {
     virt_text = true,
     virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
     delay = 1000,
     ignore_whitespace = false,
+    virt_text_priority = 100,
   },
-  current_line_blame_formatter = '<author>, <author_time:%Y-%m-%d> - <summary>',
+  current_line_blame_formatter = '<author>, <author_time:%R> - <summary>',
   sign_priority = 6,
   update_debounce = 100,
   status_formatter = nil, -- Use default
@@ -251,10 +281,8 @@ require('gitsigns').setup {
     row = 0,
     col = 1
   },
-  yadm = {
-    enable = false
-  },
 }
+
 require("mason").setup({
     ui = {
         icons = {
@@ -287,17 +315,17 @@ require'nvim-treesitter.configs'.setup {
     -- Set this to true to enable the TypeScript parser
     -- If you want to enable TypeScript highlighting, you need to set this to true
     -- even if you don't have any TypeScript files in your project
-    enabled = true,
+    -- enabled = true,
 
     -- If you want to enable TypeScript highlighting, you need to set this to true
     -- even if you don't have any TypeScript files in your project
-    disable = {},
+    --disable = {},
 
     -- Setting this to true will run the TypeScript compiler and tree-sitter at the same time.
     -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
     -- Using this option may slow down your editor, and you may see some duplicate highlights.
     -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
+    -- additional_vim_regex_highlighting = false,
   },
   highlight = {
     enable = true,
@@ -308,13 +336,13 @@ require'nvim-treesitter.configs'.setup {
     -- list of language that will be disabled
     -- disable = { "c", "rust" },
     -- -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
-    -- disable = function(lang, buf)
-    --     local max_filesize = 100 * 1024 -- 100 KB
-    --     local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-    --     if ok and stats and stats.size > max_filesize then
-    --         return true
-    --     end
-    -- end,
+    disable = function(lang, buf)
+        local max_filesize = 100 * 1024 -- 100 KB
+        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+        if ok and stats and stats.size > max_filesize then
+            return true
+        end
+    end,
 
     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
     -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
@@ -332,6 +360,26 @@ require'lspconfig'.volar.setup{
   }
 }
 
+-- You dont need to set any of these options. These are the default ones. Only
+-- the loading is important
+require('telescope').setup {
+  extensions = {
+    fzf = {
+      fuzzy = true,                    -- false will only do exact matching
+      override_generic_sorter = true,  -- override the generic sorter
+      override_file_sorter = true,     -- override the file sorter
+      case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+                                       -- the default case_mode is "smart_case"
+    }
+  }
+}
+-- To get fzf loaded and working with telescope, you need to call
+-- load_extension, somewhere after setup function:
+require('telescope').load_extension('fzf')
+
+-- require('lspconfig').ruff_lsp.setup{}
 require("ibl").setup()
 require('zen-mode').setup({window={width=0.85}})
 require("lsp-file-operations").setup()
+require('nvim-surround').setup()
+
